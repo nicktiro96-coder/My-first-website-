@@ -1,2 +1,189 @@
-# My-first-website-
-My first website built using GitHub 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lion Head Grand Bonanza XL</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --card-bg: #1e1e24;
+            --accent: #ffb703;
+            --text: #ffffff;
+            --win-color: #4ecca3;
+        }
+        body { background-color: var(--bg-color); color: var(--text); font-family: sans-serif; text-align: center; margin: 0; padding: 10px; }
+        .container { max-width: 480px; margin: 0 auto; background: var(--card-bg); padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { font-size: 22px; color: var(--accent); margin: 5px 0; }
+        
+        /* Wallet & Dashboard UI */
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; background: #15151a; padding: 10px; border-radius: 8px; font-size: 14px; }
+        .balance-box { color: var(--win-color); font-weight: bold; }
+        .wallet-btn { background: #333; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 5px; }
+        
+        /* 4x5 Grid Layout */
+        .grid-5000 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 15px 0; background: #0f0f12; padding: 8px; border-radius: 10px; }
+        .slot-cell { background: #252530; aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 1px solid #3a3a4a; }
+        
+        /* Lion Animation Styling */
+        .lion-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; transition: transform 0.2s ease; }
+        .lion-head { font-size: 24px; position: relative; z-index: 2; }
+        .lion-hair { font-size: 10px; color: #e67e22; position: absolute; top: 12px; width: 100%; text-align: center; font-weight: bold; opacity: 0.8; letter-spacing: -1px; transition: all 0.3s ease; transform: scale(0.5); }
+        .chip { position: absolute; font-size: 12px; animation: eatChip 0.4s ease forwards; z-index: 3; }
+        
+        @keyframes eatChip {
+            0% { transform: translateY(25px) scale(1); opacity: 1; }
+            100% { transform: translateY(-5px) scale(0.2); opacity: 0; }
+        }
+        
+        /* Control Panel Buttons */
+        .btn-main { background: linear-gradient(180deg, #ffb703, #fb8500); border: none; border-radius: 25px; color: #000; font-size: 18px; font-weight: bold; padding: 12px 0; width: 100%; cursor: pointer; box-shadow: 0 4px #b86200; }
+        .btn-main:active { transform: translateY(2px); box-shadow: 0 2px #b86200; }
+        .status-banner { margin-top: 10px; font-size: 13px; min-height: 20px; color: #bbb; }
+        
+        /* Modal Screens (Payment & Bonus) */
+        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { background: #22222b; border: 2px solid var(--accent); border-radius: 12px; padding: 20px; width: 100%; max-width: 360px; text-align: left; }
+        .modal-box h2 { text-align: center; color: var(--accent); margin-top: 0; font-size: 18px; }
+        .hidden { display: none !important; }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; margin-bottom: 4px; color: #aaa; }
+        .form-group select, .form-group input { width: 100%; padding: 8px; box-sizing: border-box; background: #15151a; border: 1px solid #444; color: #fff; border-radius: 4px; }
+        .btn-action { background: var(--accent); color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        
+        /* Bonus Screen grid */
+        .bonus-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .bonus-head { background: #2d2d3a; aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid transparent; }
+        .bonus-head:hover { border-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🦁 Lion Head Grand Bonanza XL 🦁</h1>
+    
+    <!-- Account Status Panel -->
+    <div class="dashboard">
+        <div>
+            Balance: <span class="balance-box" id="user-balance">100.00</span> P
+            <button class="wallet-btn" onclick="toggleModal('wallet-modal', true)">💸 Wallet</button>
+        </div>
+        <div style="text-align: right;">Wager: <b>1.00 P</b></div>
+    </div>
+
+    <!-- 4x5 Layout Screen -->
+    <div class="grid-5000" id="slot-grid"></div>
+
+    <button class="btn-main" onclick="playTurn()">SPIN (1 Pula)</button>
+    <div class="status-banner" id="game-status">Set your deposit and spin for bursting mane action!</div>
+</div>
+
+<!-- WALLET MODAL PANEL -->
+<div class="modal-overlay hidden" id="wallet-modal">
+    <div class="modal-box">
+        <h2>💸 Gateway Deposit & Withdrawal</h2>
+        <div class="form-group">
+            <label>Select Financial Service Platform</label>
+            <select id="payment-provider">
+                <option value="Orange Money">Orange Money</option>
+                <option value="MyZaka">MyZaka (Mascom)</option>
+                <option value="Smega">Smega (BTC)</option>
+                <option value="PayPal">PayPal Global</option>
+                <option value="Local Bank">Local Bank Transfer</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Amount (BWP / Pula)</label>
+            <input type="number" id="wallet-amount" value="50" min="10">
+        </div>
+        <button class="btn-action" onclick="processTransaction('deposit')">Deposit Funds</button>
+        <button class="btn-action" style="background:#444; color:#fff; margin-top:5px;" onclick="processTransaction('withdraw')">Withdraw Cash</button>
+        <button class="btn-action" style="background:transparent; color:#aaa; margin-top:5px;" onclick="toggleModal('wallet-modal', false)">Cancel</button>
+    </div>
+</div>
+
+<!-- JACKPOT BONUS PICKER MODAL -->
+<div class="modal-overlay hidden" id="bonus-modal">
+    <div class="modal-box" style="text-align: center;">
+        <h2 style="margin-bottom: 5px;">🎉 JACKPOT BONUS ROUND 🎉</h2>
+        <p style="font-size: 13px; color: #ccc; margin: 0;">Select a bloated lion head container to burst for the grand payout!</p>
+        <div class="bonus-grid" id="bonus-container"></div>
+    </div>
+</div>
+
+<script>
+    let playerFunds = 100.00;
+    const gridRows = 4;
+    const gridCols = 5;
+    const standardIcons = ['🦁', '💎', '🍒', '🔔', '🍇', '🍋', '⭐'];
+    
+    // Tracks mane structural hair volume growth layers per index (0 to 20)
+    let lionManeState = Array(20).fill(0);
+
+    function initGridDisplay() {
+        const board = document.getElementById('slot-grid');
+        board.innerHTML = '';
+        for (let i = 0; i < gridRows * gridCols; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'slot-cell';
+            cell.id = `cell-${i}`;
+            cell.innerHTML = `<div class="lion-wrapper"><span class="lion-head">🦁</span><span class="lion-hair">||||</span></div>`;
+            board.appendChild(cell);
+        }
+        updateHairVisuals();
+    }
+
+    function toggleModal(id, isOpen) {
+        document.getElementById(id).classList.toggle('hidden', !isOpen);
+    }
+
+    function processTransaction(type) {
+        const amt = parseFloat(document.getElementById('wallet-amount').value);
+        const engine = document.getElementById('payment-provider').value;
+        if (isNaN(amt) || amt <= 0) return alert("Please enter a valid numeric value.");
+
+        if (type === 'deposit') {
+            playerFunds += amt;
+            alert(`Success: Deposited ${amt.toFixed(2)} Pula securely via ${engine}.`);
+        } else {
+            if (amt > playerFunds) return alert("Insufficient available balance to complete withdrawal request.");
+            playerFunds -= amt;
+            alert(`Success: Forwarded ${amt.toFixed(2)} Pula withdrawal instruction to your ${engine} account.`);
+        }
+        document.getElementById('user-balance').innerText = playerFunds.toFixed(2);
+        toggleModal('wallet-modal', false);
+    }
+
+    function updateHairVisuals() {
+        for (let i = 0; i < 20; i++) {
+            const cell = document.getElementById(`cell-${i}`);
+            const wrapper = cell.querySelector('.lion-wrapper');
+            const hair = cell.querySelector('.lion-hair');
+            const icon = cell.dataset.symbol || '🦁';
+
+            if (icon === '🦁') {
+                wrapper.style.transform = `scale(${1 + (lionManeState[i] * 0.15)})`;
+                hair.style.transform = `scale(${0.5 + (lionManeState[i] * 0.4)})`;
+                hair.style.opacity = lionManeState[i] > 0 ? "1" : "0";
+                // Add hair characters dynamically matching structural weight
+                hair.innerText = Array(lionManeState[i] + 1).fill('||||').join('');
+            } else {
+                hair.style.opacity = "0";
+                wrapper.style.transform = "scale(1)";
+            }
+        }
+    }
+
+    function playTurn() {
+        if (playerFunds < 1.00) {
+            alert("Insufficient funds! Open the Wallet interface to deposit cash.");
+            return toggleModal('wallet-modal', true);
+        }
+
+        playerFunds -= 1.00;
+        document.getElementById('user-balance').innerText = playerFunds.toFixed(2);
+        
+        const banner = document.getElementById('game-status');
+        banner.innerText = "Reels rolling... checking matching symbols...";
+
