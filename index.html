@@ -1,232 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lion Head Grand Bonanza</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #121214; text-align: center; padding: 20px; color: #fff; }
-        .card { background: #1e1e24; padding: 20px; border-radius: 15px; max-width: 480px; margin: 20px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.5); border: 2px solid #333; }
-        h1, h2 { margin: 5px 0; color: #ffb703; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .stats { display: flex; justify-content: space-around; margin: 15px 0; font-size: 1.1rem; background: #2a2a35; padding: 10px; border-radius: 8px; }
-        
-        /* Pots Section */
-        .pot-container { display: flex; justify-content: space-around; margin: 15px 0; }
-        .lion-pot { font-size: 2.5rem; transition: transform 0.2s ease; position: relative; cursor: default; }
-        .pot-label { font-size: 0.75rem; display: block; margin-top: 5px; font-weight: bold; }
-        .red-txt { color: #ff4d4d; } .blue-txt { color: #4da6ff; } .gold-txt { color: #ffcc00; }
 
-        /* Reels */
-        .reels-box { display: flex; justify-content: center; gap: 15px; margin: 20px 0; background: #0f0f12; padding: 15px; border-radius: 10px; border: 2px solid #ffb703; }
-        .reel { font-size: 3rem; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; background: #222; border-radius: 5px; box-shadow: inset 0 0 10px #000; }
+        .status-banner { margin-top: 10px; font-size: 13px; min-height: 20px; color: #bbb; }
         
-        /* Buttons */
-        .btn { background: linear-gradient(180deg, #ffb703, #fb8500); color: #000; border: none; padding: 14px 30px; border-radius: 30px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(251,133,0,0.4); width: 80%; transition: 0.1s; }
-        .btn:active { transform: scale(0.98); }
-        .btn:disabled { background: #555; color: #888; box-shadow: none; cursor: not-allowed; }
-
-        /* Bonus Screens */
+        /* Modal Screens (Payment & Bonus) */
+        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { background: #22222b; border: 2px solid var(--accent); border-radius: 12px; padding: 20px; width: 100%; max-width: 360px; text-align: left; }
+        .modal-box h2 { text-align: center; color: var(--accent); margin-top: 0; font-size: 18px; }
         .hidden { display: none !important; }
-        .bonus-overlay { background: #2a1b4e; padding: 20px; border-radius: 10px; border: 2px dashed #ffcc00; margin: 15px 0; }
-        .pick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
-        .pick-item { background: #3d2b63; font-size: 1.5rem; padding: 15px; border-radius: 8px; border: 1px solid #7a56c2; cursor: pointer; height: 40px; display: flex; align-items: center; justify-content: center; }
         
-        .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: #111; padding: 10px; border-radius: 5px; margin-top: 15px; }
-        .pin-spot { background: #222; height: 50px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 1px solid #444; font-weight: bold; }
-        .pin-active { border-color: #ffcc00; background: #4a3c00; color: #ffcc00; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; margin-bottom: 4px; color: #aaa; }
+        .form-group select, .form-group input { width: 100%; padding: 8px; box-sizing: border-box; background: #15151a; border: 1px solid #444; color: #fff; border-radius: 4px; }
+        .btn-action { background: var(--accent); color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 8px; }
         
-        #msg { min-height: 24px; margin-top: 15px; font-weight: bold; color: #ffb703; font-size: 1.1rem; }
+        /* Bonus Screen grid */
+        .bonus-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .bonus-head { background: #2d2d3a; aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border: 2px solid transparent; }
+        .bonus-head:hover { border-color: var(--accent); }
     </style>
 </head>
 <body>
-    <!-- How to Play Rules Section -->
-    <div class="card" style="text-align: left; max-width: 480px; margin: 20px auto; font-size: 0.95rem; line-height: 1.5;">
-        <h3 style="color: #ffb703; text-align: center; margin-top: 0;">📖 How to Play Rules</h3>
-        
-        <p style="margin: 5px 0;"><strong>1. Game Cost:</strong> Each spin costs exactly <strong>1 Pula</strong>, deducted from your main balance.</p>
-        
-        <p style="margin: 15px 0 5px 0;"><strong>2. Base Reel Wins:</strong></p>
-        <ul style="margin: 0; padding-left: 20px; color: #ccc;">
-            <li>Matching Pair: Wins a random payout up to 17 Pula.</li>
-            <li>3-of-a-Kind: Wins a large random payout up to 1000 Pula!</li>
-            <li><span style="color: #ffb703;">⭐ Wild Stars:</span> Substitute for any fruit or number symbol to help complete winning pairs or lines.</li>
-        </ul>
 
-        <p style="margin: 15px 0 5px 0;"><strong>3. The 3 Lion Bonus Pots:</strong></p>
-        <p style="margin: 5px 0; color: #ccc;">When a gold <strong style="color: #ffcc00;">Coin Chip (🪙)</strong> lands on the reels, a random Lion Head swallows it and grows larger. When a Lion head grows big enough, it bursts open to trigger its feature:</p>
-        <ul style="margin: 0; padding-left: 20px;">
-            <li><strong class="red-txt">1️⃣ Red Lion:</strong> Triggers <strong>24 Free Spins</strong> where all wins are automatically multiplied by 2x.</li>
-            <li><strong class="blue-txt">2️⃣ Blue Lion:</strong> Triggers the <strong>Mystery Pick'em game</strong> where you smash 3 pots for random cash rewards.</li>
-            <li><strong class="gold-txt">3️⃣ Gold Lion:</strong> Triggers the <strong>Pin2Win Respin Engine</strong>. Fill the entire 3x3 board with coins to burst the ultimate <strong>5,000 Pula Grand Jackpot!</strong></li>
-        </ul>
+<div class="container">
+    <h1>🦁 Lion Head Grand Bonanza XL 🦁</h1>
+    
+    <!-- Account Status Panel -->
+    <div class="dashboard">
+        <div>
+            Balance: <span class="balance-box" id="user-balance">100.00</span> P
+            <button class="wallet-btn" onclick="toggleModal('wallet-modal', true)">💸 Wallet</button>
+        </div>
+        <div style="text-align: right;">Wager: <b>1.00 P</b></div>
     </div>
 
-    <div class="card">
-        <h2>🦁 LION BONANZA 🦁</h2>
-        
-        <!-- Game Displays -->
-        <div class="stats">
-            <div>Balance: <strong id="balance" class="gold-txt">100.00</strong> P</div>
-            <div>Wager: <strong id="wager">1.00</strong> P</div>
-        </div>
+    <!-- 4x5 Layout Screen -->
+    <div class="grid-5000" id="slot-grid"></div>
 
-        <!-- Three Lion Pots -->
-        <div class="pot-container">
-            <div id="pot-free-spins" class="lion-pot">1️⃣🦁<span class="pot-label red-txt">24 FREE SPINS</span></div>
-            <div id="pot-pickem" class="lion-pot">2️⃣🦁<span class="pot-label blue-txt">MYSTERY PICK</span></div>
-            <div id="pot-pin2win" class="lion-pot">3️⃣🦁<span class="pot-label gold-txt">PIN 2 WIN</span></div>
-        </div>
+    <button class="btn-main" onclick="playTurn()">SPIN (1 Pula)</button>
+    <div class="status-banner" id="game-status">Set your deposit and spin for bursting mane action!</div>
+</div>
 
-        <!-- Main Game Core View -->
-        <div id="main-game-interface">
-            <div class="reels-box">
-                <div id="r1" class="reel">🍒</div>
-                <div id="r2" class="reel">🍋</div>
-                <div id="r3" class="reel">🍇</div>
-            </div>
-            <button id="spin-btn" class="btn">SPIN (1 Pula)</button>
+<!-- WALLET MODAL PANEL -->
+<div class="modal-overlay hidden" id="wallet-modal">
+    <div class="modal-box">
+        <h2>💸 Gateway Deposit & Withdrawal</h2>
+        <div class="form-group">
+            <label>Select Financial Service Platform</label>
+            <select id="payment-provider">
+                <option value="Orange Money">Orange Money</option>
+                <option value="MyZaka">MyZaka (Mascom)</option>
+                <option value="Smega">Smega (BTC)</option>
+                <option value="PayPal">PayPal Global</option>
+                <option value="Local Bank">Local Bank Transfer</option>
+            </select>
         </div>
-
-        <!-- FEATURE SCREEN: FREE SPINS -->
-        <div id="mode-free-spins" class="bonus-overlay hidden">
-            <h3 class="red-txt">🔥 24 LION FREE SPINS 🔥</h3>
-            <p>Spins Remaining: <strong id="fs-count">0</strong></p>
-            <p>Wilds are super active! All payouts are doubled (2x)!</p>
+        <div class="form-group">
+            <label>Amount (BWP / Pula)</label>
+            <input type="number" id="wallet-amount" value="50" min="10">
         </div>
-
-        <!-- FEATURE SCREEN: PICK'EM -->
-        <div id="mode-pickem" class="bonus-overlay hidden">
-            <h3 class="blue-txt">🏺 LION'S RANDOM TREASURE 🏺</h3>
-            <p>Select 3 mysterious pots to secure huge random Pula rewards:</p>
-            <div id="pick-container" class="pick-grid"></div>
-        </div>
-
-        <!-- FEATURE SCREEN: PIN2WIN JACKPOT -->
-        <div id="mode-pin2win" class="bonus-overlay hidden">
-            <h3 class="gold-txt">⚡ PIN 2 WIN RESPIN ENGINE ⚡</h3>
-            <p>Respins Left: <strong id="pin-respins">3</strong></p>
-            <div id="pin-board" class="pin-grid"></div>
-        </div>
-
-        <!-- Global Status Messages -->
-        <p id="msg"></p>
+        <button class="btn-action" onclick="processTransaction('deposit')">Deposit Funds</button>
+        <button class="btn-action" style="background:#444; color:#fff; margin-top:5px;" onclick="processTransaction('withdraw')">Withdraw Cash</button>
+        <button class="btn-action" style="background:transparent; color:#aaa; margin-top:5px;" onclick="toggleModal('wallet-modal', false)">Cancel</button>
     </div>
+</div>
 
-    <script>
-        let balance = 100.00;
-        const costPerSpin = 1.00;
-        // '⭐' is the WILD symbol, and '🪙' is the collector coin chip
-        const primarySymbols = ['🍒', '🍋', '🍇', '💎', '7️⃣', '🪙', '⭐']; 
-        
-        let potScales = { freeSpins: 1.0, pickem: 1.0, pin2win: 1.0 };
+<!-- JACKPOT BONUS PICKER MODAL -->
+<div class="modal-overlay hidden" id="bonus-modal">
+    <div class="modal-box" style="text-align: center;">
+        <h2 style="margin-bottom: 5px;">🎉 JACKPOT BONUS ROUND 🎉</h2>
+        <p style="font-size: 13px; color: #ccc; margin: 0;">Select a bloated lion head container to burst for the grand payout!</p>
+        <div class="bonus-grid" id="bonus-container"></div>
+    </div>
+</div>
 
-        let freeSpinsActive = false;
-        let freeSpinsCount = 0;
+<script>
+    let playerFunds = 100.00;
+    const gridRows = 4;
+    const gridCols = 5;
+    const standardIcons = ['🦁', '💎', '🍒', '🔔', '🍇', '🍋', '⭐'];
+    
+    // Tracks mane structural hair volume growth layers per index (0 to 20)
+    let lionManeState = Array(20).fill(0);
 
-        const balanceNode = document.getElementById('balance');
-        const spinBtnNode = document.getElementById('spin-btn');
-        const r1 = document.getElementById('r1');
-        const r2 = document.getElementById('r2');
-        const r3 = document.getElementById('r3');
-        const msgNode = document.getElementById('msg');
-        
-        const mainInterface = document.getElementById('main-game-interface');
-        const modeFS = document.getElementById('mode-free-spins');
-        const modePick = document.getElementById('mode-pickem');
-        const modePin = document.getElementById('mode-pin2win');
+    function initGridDisplay() {
+        const board = document.getElementById('slot-grid');
+        board.innerHTML = '';
+        for (let i = 0; i < gridRows * gridCols; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'slot-cell';
+            cell.id = `cell-${i}`;
+            cell.innerHTML = `<div class="lion-wrapper"><span class="lion-head">🦁</span><span class="lion-hair">||||</span></div>`;
+            board.appendChild(cell);
+        }
+        updateHairVisuals();
+    }
 
-        spinBtnNode.addEventListener('click', executeSpinCycle);
+    function toggleModal(id, isOpen) {
+        document.getElementById(id).classList.toggle('hidden', !isOpen);
+    }
 
-        function executeSpinCycle() {
-            if (!freeSpinsActive && balance < costPerSpin) {
-                printStatus("❌ Insufficient funds! Please reload page.", "#ff4d4d");
-                return;
-            }
+    function processTransaction(type) {
+        const amt = parseFloat(document.getElementById('wallet-amount').value);
+        const engine = document.getElementById('payment-provider').value;
+        if (isNaN(amt) || amt <= 0) return alert("Please enter a valid numeric value.");
 
-            if (!freeSpinsActive) {
-                balance -= costPerSpin;
-                updateBalanceDisplay();
-            }
-            
-            printStatus("", "");
-            spinBtnNode.disabled = true;
+        if (type === 'deposit') {
+            playerFunds += amt;
+            alert(`Success: Deposited ${amt.toFixed(2)} Pula securely via ${engine}.`);
+        } else {
+            if (amt > playerFunds) return alert("Insufficient available balance to complete withdrawal request.");
+            playerFunds -= amt;
+            alert(`Success: Forwarded ${amt.toFixed(2)} Pula withdrawal instruction to your ${engine} account.`);
+        }
+        document.getElementById('user-balance').innerText = playerFunds.toFixed(2);
+        toggleModal('wallet-modal', false);
+    }
 
-            const s1 = getRandomSymbol();
-            const s2 = getRandomSymbol();
-            const s3 = getRandomSymbol();
+    function updateHairVisuals() {
+        for (let i = 0; i < 20; i++) {
+            const cell = document.getElementById(`cell-${i}`);
+            const wrapper = cell.querySelector('.lion-wrapper');
+            const hair = cell.querySelector('.lion-hair');
+            const icon = cell.dataset.symbol || '🦁';
 
-            r1.innerText = s1; r2.innerText = s2; r3.innerText = s3;
-
-            let chipsLanded = [s1, s2, s3].filter(s => s === '🪙').length;
-
-            if (chipsLanded > 0) {
-                handleChipSwallowSequence(chipsLanded);
+            if (icon === '🦁') {
+                wrapper.style.transform = `scale(${1 + (lionManeState[i] * 0.15)})`;
+                hair.style.transform = `scale(${0.5 + (lionManeState[i] * 0.4)})`;
+                hair.style.opacity = lionManeState[i] > 0 ? "1" : "0";
+                // Add hair characters dynamically matching structural weight
+                hair.innerText = Array(lionManeState[i] + 1).fill('||||').join('');
             } else {
-                evaluateStandardMatrixWins(s1, s2, s3);
+                hair.style.opacity = "0";
+                wrapper.style.transform = "scale(1)";
             }
         }
+    }
 
-        function getRandomSymbol() {
-            return primarySymbols[Math.floor(Math.random() * primarySymbols.length)];
+    function playTurn() {
+        if (playerFunds < 1.00) {
+            alert("Insufficient funds! Open the Wallet interface to deposit cash.");
+            return toggleModal('wallet-modal', true);
         }
 
-        function updateBalanceDisplay() {
-            balanceNode.innerText = balance.toFixed(2);
-        }
-
-        function printStatus(text, color) {
-            msgNode.innerText = text;
-            if (color) msgNode.style.color = color;
-        }
-
-        function handleChipSwallowSequence(count) {
-            printStatus(`🪙 Lion Heads swallowed ${count} Chip(s)!`, "#ffcc00");
-            
-            const potKeys = ['freeSpins', 'pickem', 'pin2win'];
-            const targetedFeature = potKeys[Math.floor(Math.random() * potKeys.length)];
-            
-            potScales[targetedFeature] += (0.15 * count);
-            
-            let potElementId = targetedFeature === 'freeSpins' ? 'pot-free-spins' : (targetedFeature === 'pickem' ? 'pot-pickem' : 'pot-pin2win');
-            let potElement = document.getElementById(potElementId);
-            potElement.style.transform = `scale(${potScales[targetedFeature]})`;
-
-            setTimeout(() => {
-                if (potScales[targetedFeature] >= 1.4) {
-                    potScales[targetedFeature] = 1.0;
-                    potElement.style.transform = "scale(1.0)";
-                    launchFeatureEngine(targetedFeature);
-                } else {
-                    spinBtnNode.disabled = false;
-                    if (freeSpinsActive) continueFreeSpinsSequence();
-                }
-            }, 600);
-        }
-
-        function evaluateStandardMatrixWins(s1, s2, s3) {
-            let directPayout = 0;
-            let multiplier = freeSpinsActive ? 2 : 1;
-
-            if (s1 === '🪙' || s2 === '🪙' || s3 === '🪙') return;
-
-            let isThreeOfAKind = false;
-            let isPair = false;
-
-            if ((s1 === s2 || s1 === '⭐' || s2 === '⭐') && 
-                (s2 === s3 || s2 === '⭐' || s3 === '⭐') && 
-                (s1 === s3 || s1 === '⭐' || s3 === '⭐')) {
-                isThreeOfAKind = true;
-            } else if (s1 === s2 || s2 === s3 || s1 === s3 || s1 === '⭐' || s2 === '⭐' || s3 === '⭐') {
-                isPair = true;
-            }
-
-            if (isThreeOfAKind) {
-                directPayout = Math.floor(Math.random() * 950) + 50;
-                printStatus(`🎉 WILD 3-OF-A-KIND! Won Random +${(directPayout * multiplier).toFixed(2)} Pula!`, "#4da6ff");
-            } else if (isPair) {
-                directPayout = Math.floor(Math.random() * 15) + 2;
-                printStatus(`✨ Connected Pair! Won Random +${(directPayout * multiplier).toFixed(2)} Pula`, "#4da6ff");
-            } else {
-                if (!freeSpinsActive) printStatus("No match. Spin again!", "#888");
-            }
-
+        playerFunds -= 1.00;
+        document.getElementById('user-balance').innerText = playerFunds.toFixed(2);
+        
+        const banner = document.getElementById('game-status');
+        banner.innerText = "Reels rolling... checking matching symbols...";
