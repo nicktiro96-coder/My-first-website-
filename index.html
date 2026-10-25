@@ -118,8 +118,8 @@
 </div>
 
 <script>
-    let playerFunds = 0.00; // Starts at 0 to default into Demo Mode
-    let demoFunds = 1000.00; // Free practice tokens
+    let playerFunds = 0.00; 
+    let demoFunds = 1000.00; 
     let isLiveMode = false;
     
     const gridRows = 4;
@@ -148,7 +148,6 @@
         const balanceDisplay = document.getElementById('user-balance');
         const modeIndicator = document.getElementById('game-mode-indicator');
         const spinBtn = document.getElementById('spin-btn-element');
-        const banner = document.getElementById('game-status');
 
         if (playerFunds > 0) {
             isLiveMode = true;
@@ -178,4 +177,8 @@
             alert(`Success: Deposited ${amt.toFixed(2)} Pula securely via ${engine}. Switching to Live Mode!`);
         } else {
             if (!isLiveMode) return alert("You are playing in free demo mode. You must deposit real funds before withdrawing.");
+            if (amt > playerFunds) return alert("Insufficient available balance to complete withdrawal request.");
+            playerFunds -= amt;
+            alert(`Success: Forwarded ${amt.toFixed(2)} Pula withdrawal instruction to your ${engine} account.`);
+
 
